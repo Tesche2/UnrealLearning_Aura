@@ -22,8 +22,6 @@ public:
 	AAuraEnemy();
 
 protected:
-	virtual void Tick(float DeltaSeconds) override;
-	
-	bool bIsHighlighted = false;
+	virtual void BeginPlay() override;
 	
 };
