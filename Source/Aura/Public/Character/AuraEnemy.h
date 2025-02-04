@@ -16,9 +16,11 @@ class AURA_API AAuraEnemy : public AAuraCharacterBase, public ITargetInterface
 	GENERATED_BODY()
 
 public:
+	/** Enemy Interface */
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
-
+	/** end Enemy Interface */
+	
 	AAuraEnemy();
 
 protected:
