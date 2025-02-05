@@ -29,11 +29,12 @@ public:
 
 #pragma region Health
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")
-	FGameplayAttributeData Health;
-	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Health);
+	FGameplayAttributeData Health; // Create attribute
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Health); // Generate get/set/init
 
 	UFUNCTION()
-	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth)
+	// Automatically replicate when attribute is updated
+	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth) 
 	{
 		GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Health, OldHealth);
 	}
