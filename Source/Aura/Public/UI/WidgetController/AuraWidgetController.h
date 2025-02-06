@@ -51,8 +51,10 @@ public:
 	 *
 	 * @param WCParams Parameters to set.
 	 */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FWidgetControllerParams& WCParams);
+
+	virtual void BroadcastInitialValues();
 
 protected:
 

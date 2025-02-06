@@ -42,6 +42,7 @@ void AAuraHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySyst
 	 * in blueprints
 	 */
 	OverlayWidget->SetWidgetController(WidgetController);
+	WidgetController->BroadcastInitialValues();
 
 	// Add Widget to Viewport (Why not OverlayWidget??)
 	Widget->AddToViewport();
