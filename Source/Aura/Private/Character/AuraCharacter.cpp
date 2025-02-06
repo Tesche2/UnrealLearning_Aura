@@ -5,7 +5,9 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
+#include "UI/HUD/AuraHUD.h"
 
 AAuraCharacter::AAuraCharacter()
 {
@@ -46,4 +48,15 @@ void AAuraCharacter::InitAbilityActorInfo()
 	// Set AuraCharacterBase class' ASC and AS
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuraPlayerState->GetAttributeSet();
+
+	/* An AAuraPlayerController* will always exist on the client side, but not on the server, thus, we check
+	 * without crashing!
+	 */
+	if(AAuraPlayerController* AuraPlayerController = GetController<AAuraPlayerController>())
+	{	
+		if(AAuraHUD* AuraHUD = AuraPlayerController->GetHUD<AAuraHUD>())
+		{
+			AuraHUD->InitOverlay(AuraPlayerController, AuraPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 }
