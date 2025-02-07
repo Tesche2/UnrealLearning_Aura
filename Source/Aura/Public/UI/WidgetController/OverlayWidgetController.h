@@ -12,7 +12,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnManaChangedSignature, float, NewM
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxManaChangedSignature, float, NewMaxMana);
 
 /**
- * 
+ * Retrieves data from UAuraAttributeSet, unknowingly sends data to AAuraHUD
  */
 UCLASS(BlueprintType, Blueprintable)
 class AURA_API UOverlayWidgetController : public UAuraWidgetController
@@ -20,7 +20,15 @@ class AURA_API UOverlayWidgetController : public UAuraWidgetController
 	GENERATED_BODY()
 
 public:
+	/**
+	 * Sets Initial Values of all attributes.
+	 */
 	virtual void BroadcastInitialValues() override;
+	
+	/**
+	 * Binds AttributeChanged functions to each respective attribute
+	 */
+	virtual void BindCallbacksToDependencies() override;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
 	FOnHealthChangedSignature OnHealthChanged;
@@ -33,4 +41,10 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
 	FOnMaxManaChangedSignature OnMaxManaChanged;
+
+protected:
+	void HealthChanged(const FOnAttributeChangeData& Data) const;
+	void MaxHealthChanged(const FOnAttributeChangeData& Data) const;
+	void ManaChanged(const FOnAttributeChangeData& Data) const;
+	void MaxManaChanged(const FOnAttributeChangeData& Data) const;
 };

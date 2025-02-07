@@ -14,7 +14,7 @@
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
 /**
- * 
+ * Defines Attributes, unknowingly sends data to UOverlayWidgetController
  */
 UCLASS()
 class AURA_API UAuraAttributeSet : public UAttributeSet

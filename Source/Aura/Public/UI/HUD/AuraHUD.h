@@ -13,7 +13,7 @@ class UAuraUserWidget;
 
 struct FWidgetControllerParams;
 /**
- * 
+ * Retrieves data from UOverlayWidgetController
  */
 UCLASS()
 class AURA_API AAuraHUD : public AHUD

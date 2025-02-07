@@ -38,7 +38,7 @@ struct FWidgetControllerParams
 	
 };
 /**
- * 
+ *  Base class for widget controllers
  */
 UCLASS()
 class AURA_API UAuraWidgetController : public UObject
@@ -55,6 +55,7 @@ public:
 	void SetWidgetControllerParams(const FWidgetControllerParams& WCParams);
 
 	virtual void BroadcastInitialValues();
+	virtual void BindCallbacksToDependencies();
 
 protected:
 
