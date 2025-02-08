@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
+#include "GameFramework/Character.h"
 #include "AuraAttributeSet.generated.h"
 
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
@@ -12,6 +13,28 @@
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
+
+USTRUCT()
+struct FEffectProperties
+{
+	GENERATED_BODY()
+
+	FEffectProperties(){}
+	
+	FGameplayEffectContextHandle EffectContextHandle;
+
+	UPROPERTY()
+	UAbilitySystemComponent *TargetASC = nullptr, *SourceASC = nullptr;
+	
+	UPROPERTY()
+	AActor *TargetAvatarActor = nullptr, *SourceAvatarActor = nullptr;
+	
+	UPROPERTY()
+	AController *TargetController = nullptr, *SourceController = nullptr;
+	
+	UPROPERTY()
+	ACharacter *TargetCharacter = nullptr, *SourceCharacter = nullptr;
+};
 
 /**
  * Defines Attributes, unknowingly sends data to UOverlayWidgetController
@@ -25,6 +48,9 @@ public:
 	UAuraAttributeSet();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 
 #pragma region Health
@@ -78,4 +104,7 @@ public:
 	// TODO: Add the following line to the end of UAuraAttributeSet::GetLifetimeReplicatedProps():
 	// DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 #pragma endregion MaxMana
+
+private:
+	static void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props);
 };
