@@ -48,8 +48,11 @@ public:
 	UAuraAttributeSet();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
+
+	// Runs when an Attribute is changed, right before applying the GameplayEffect
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+
+	// Runs right after applying a GameplayEffect
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 
@@ -100,9 +103,6 @@ public:
 	{
 		GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, MaxMana, OldMaxMana);
 	}
-
-	// TODO: Add the following line to the end of UAuraAttributeSet::GetLifetimeReplicatedProps():
-	// DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 #pragma endregion MaxMana
 
 private:

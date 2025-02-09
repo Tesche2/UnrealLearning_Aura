@@ -4,6 +4,7 @@
 #include "Character/AuraCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
@@ -44,6 +45,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 	check(AuraPlayerState); // Check for pointer validity
 	// Initialize ASC
 	AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
+	Cast<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 
 	// Set AuraCharacterBase class' ASC and AS
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
