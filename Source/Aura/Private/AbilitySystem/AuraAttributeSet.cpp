@@ -49,6 +49,16 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
+
+#define CLAMP_ATTRIBUTE(AttributeName)\
+	if(Data.EvaluatedData.Attribute == Get##AttributeName##Attribute())\
+	{\
+		Set##AttributeName(FMath::Clamp(Get##AttributeName(), 0.f, GetMax##AttributeName()));\
+	}
+
+	CLAMP_ATTRIBUTE(Health);
+	CLAMP_ATTRIBUTE(Mana);
+#undef CLAMP_ATTRIBUTE
 }
 
 void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props)
