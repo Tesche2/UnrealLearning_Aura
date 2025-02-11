@@ -55,6 +55,67 @@ public:
 	// Runs right after applying a GameplayEffect
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
+	/*
+	 * Primary Attributes
+	 */
+
+#pragma region Strength
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Strength, Category = "Primary Attributes")
+	FGameplayAttributeData Strength;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Strength);
+
+	UFUNCTION()
+	virtual void OnRep_Strength(const FGameplayAttributeData& OldStrength)
+	{
+		GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Strength, OldStrength);
+	}
+#pragma endregion Strength
+
+#pragma region Intelligence
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Intelligence, Category = "Primary Attributes")
+	FGameplayAttributeData Intelligence;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Intelligence);
+
+	UFUNCTION()
+	virtual void OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence)
+	{
+		GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Intelligence, OldIntelligence);
+	}
+#pragma endregion Intelligence
+
+#pragma region Resilience
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Resilience, Category = "Primary Attributes")
+	FGameplayAttributeData Resilience;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Resilience);
+
+	UFUNCTION()
+	virtual void OnRep_Resilience(const FGameplayAttributeData& OldResilience)
+	{
+		GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Resilience, OldResilience);
+	}
+#pragma endregion Resilience
+
+#pragma region Vigor
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Vigor, Category = "Primary Attributes")
+	FGameplayAttributeData Vigor;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Vigor);
+
+	UFUNCTION()
+	virtual void OnRep_Vigor(const FGameplayAttributeData& OldVigor)
+	{
+		GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Vigor, OldVigor);
+	}
+#pragma endregion Vigor
+
+	/*
+	 * Secondary Attributes
+	 */
+
+	
+	
+	/*
+	 * Vital Attributes
+	 */
 
 #pragma region Health
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")
