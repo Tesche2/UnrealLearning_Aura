@@ -31,16 +31,25 @@ void AAuraCharacterBase::InitAbilityActorInfo()
 {
 }
 
-void AAuraCharacterBase::InitializePrimaryAttributes() const
+void AAuraCharacterBase::InitializeDefaultAttributes() const
 {
-	check(IsValid(GetAbilitySystemComponent()));
-	check(DefaultPrimaryAttributes);
-	
-	const FGameplayEffectContextHandle EffectContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
-	
-	const FGameplayEffectSpecHandle EffectSpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(
-		DefaultPrimaryAttributes, 1.f, EffectContextHandle);
-	
-	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(
-		*EffectSpecHandle.Data.Get(), GetAbilitySystemComponent());
+	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
+	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
+}
+
+void AAuraCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect> AttributeClass, const float Level) const
+{
+	check(IsValid(AbilitySystemComponent));
+	check(AttributeClass);
+
+	// Make GE context (who fired skill, who received skill)
+	const FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
+
+	// Make GE Spec Handle (skill level, caster's attributes)
+	const FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(
+		AttributeClass, Level, ContextHandle);
+
+	// Apply GE to target
+	AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(
+		*SpecHandle.Data.Get(), AbilitySystemComponent);
 }
