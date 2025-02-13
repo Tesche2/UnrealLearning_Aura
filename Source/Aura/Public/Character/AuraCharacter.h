@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Character/AuraCharacterBase.h"
-#include "Interaction/CombatInterface.h"
 #include "AuraCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class AURA_API AAuraCharacter : public AAuraCharacterBase, public ICombatInterface
+class AURA_API AAuraCharacter : public AAuraCharacterBase
 {
 	GENERATED_BODY()
 
@@ -22,7 +21,7 @@ public:
 	virtual void OnRep_PlayerState() override;
 
 	/** Combat Interface */
-	virtual int32 GetPlayerLevel() override;
+	virtual int32 GetPlayerLevel() const override;
 	/** end Combat Interface */
 
 private:
