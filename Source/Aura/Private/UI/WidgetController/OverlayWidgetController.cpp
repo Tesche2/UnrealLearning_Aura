@@ -7,9 +7,6 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 
-
-
-
 void UOverlayWidgetController::BroadcastInitialValues()
 {
 	// Cast AttributeSet* to AuraAttributeSet*
