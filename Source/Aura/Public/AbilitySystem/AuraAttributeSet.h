@@ -36,8 +36,12 @@ struct FEffectProperties
 	ACharacter *TargetCharacter = nullptr, *SourceCharacter = nullptr;
 };
 
+template<class T>
+using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+
+
 /**
- * Defines Attributes, unknowingly sends data to UOverlayWidgetController
+ * Defines Attributes, unknowingly sends data to Controllers
  */
 UCLASS()
 class AURA_API UAuraAttributeSet : public UAttributeSet
@@ -51,10 +55,11 @@ public:
 
 	// Runs when an Attribute is changed, right before applying the GameplayEffect
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
-
 	// Runs right after applying a GameplayEffect
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
-
+	
+	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
+	
 	/*
 	 * Primary Attributes
 	 */
