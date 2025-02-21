@@ -4,15 +4,20 @@
 #include "Player/AuraPlayerController.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AuraGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameplayTagContainer.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "Components/SplineComponent.h"
 #include "Input/AuraInputComponent.h"
 #include "Interaction/TargetInterface.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
 	bReplicates = true;
+	Spline = CreateDefaultSubobject<USplineComponent>("Spline");
 }
 
 void AAuraPlayerController::PlayerTick(float DeltaTime)
@@ -20,11 +25,13 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	CursorTrace();
+
+	AutoRun();
+	
 }
 
 void AAuraPlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit); // Ray cast
 
 	if(!CursorHit.bBlockingHit) return; // Nothing hit
@@ -42,36 +49,52 @@ void AAuraPlayerController::CursorTrace()
 	 * E. LastActor = valid && ThisActor = valid && ThisActor == LastActor : DO NOTHING
 	 * -----------------------------------------------------
 	 */
-
 	if(ThisActor != LastActor)
 	{
-		if(LastActor)
-		{
-			LastActor->UnHighlightActor();
-		}
-
-		if(ThisActor)
-		{
-			ThisActor->HighlightActor();
-		}
+		if(LastActor) LastActor->UnHighlightActor();
+		if(ThisActor) ThisActor->HighlightActor();
 	}
 }
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	//GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, *InputTag.ToString());
+	if(InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
+	{
+		bTargeting = ThisActor ? true : false;
+		bAutoRunning = false;
+		FollowTime = 0.f;
+	}
+	
 }
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	if(!GetASC()) return;
-	GetASC()->AbilityInputTagReleased(InputTag);
+	// If Input is not LMB or enemy is targeted
+	if(!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB) || bTargeting)
+	{
+		if(!GetASC()) return;
+		GetASC()->AbilityInputTagReleased(InputTag);
+	}
+	else // Else, check if LMB was held or tapped
+	{
+		StopManualRunning();
+	}
 }
 
 void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	if(!GetASC()) return;
-	GetASC()->AbilityInputTagHeld(InputTag);
+	// If Input is not LMB or enemy is targeted, attack
+	if(!(InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB)) || bTargeting)
+	{
+		if(!GetASC()) return;
+		GetASC()->AbilityInputTagHeld(InputTag);
+	}
+	else // Else, move character
+	{
+		FollowCursor();
+	}
+	
+	
 }
 
 UAuraAbilitySystemComponent* AAuraPlayerController::GetASC()
@@ -146,4 +169,71 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
 	}
+}
+
+void AAuraPlayerController::AutoRun()
+{
+	if(APawn* ControlledPawn = GetPawn(); bAutoRunning)
+	{
+		const FVector LocationOnSpline = Spline->FindLocationClosestToWorldLocation(
+			ControlledPawn->GetActorLocation(),
+			ESplineCoordinateSpace::World);
+		const FVector Direction = Spline->FindDirectionClosestToWorldLocation(
+			LocationOnSpline,
+			ESplineCoordinateSpace::World);
+
+		ControlledPawn->AddMovementInput(Direction);
+
+		const float DistanceToDestination = (LocationOnSpline - CachedDestination).Length();
+		if(DistanceToDestination <= AutoRunAcceptanceRadius)
+		{
+			bAutoRunning = false;
+		}
+	}
+}
+
+void AAuraPlayerController::FollowCursor()
+{
+	FollowTime += GetWorld()->GetDeltaSeconds();
+
+	// Get clicked destination
+	if(CursorHit.bBlockingHit)
+	{
+		CachedDestination = CursorHit.ImpactPoint;
+	}
+
+	// Move Pawn to destination
+	if(APawn* ControlledPawn = GetPawn())
+	{
+		const FVector WorldDirection =
+			(CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+		ControlledPawn->AddMovementInput(WorldDirection);
+	}
+}
+
+void AAuraPlayerController::StopManualRunning()
+{
+	// If player tapped LMB, auto running should trigger
+	if(const APawn* ControlledPawn = GetPawn(); FollowTime <= ShortPressThreshold && ControlledPawn)
+	{
+		// Pathfind over NavMesh
+		if(UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(
+			this,
+			ControlledPawn->GetActorLocation(),
+			CachedDestination))
+		{
+			// Create spline from pathfinding points
+			Spline->ClearSplinePoints();
+			for(const FVector& PointLoc : NavPath->PathPoints)
+			{
+				Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
+				DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Red, false, 5.f);
+			}
+			// Update destination, so it doesn't try to pathfind into objects
+			CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+			bAutoRunning = true;
+		}
+	}
+	FollowTime = 0.f;
+	bTargeting = false;
 }

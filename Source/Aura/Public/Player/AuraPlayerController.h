@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class USplineComponent;
 class UAuraAbilitySystemComponent;
 struct FGameplayTag;
 class UAuraInputConfig;
@@ -42,6 +43,7 @@ private:
 	void CursorTrace();
 	TScriptInterface<ITargetInterface> LastActor;
 	TScriptInterface<ITargetInterface> ThisActor;
+	FHitResult CursorHit;
 
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
@@ -54,4 +56,20 @@ private:
 	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
 
 	UAuraAbilitySystemComponent* GetASC();
+
+	FVector CachedDestination = FVector::ZeroVector;
+	float FollowTime = 0.f;
+	float ShortPressThreshold = 0.5f;
+	bool bAutoRunning = false;
+	bool bTargeting = false;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float AutoRunAcceptanceRadius = 10.f;
+
+	TObjectPtr<USplineComponent> Spline;
+	
+	void FollowCursor();
+	void AutoRun();
+	void StopManualRunning();
+	
 };
